@@ -31,7 +31,7 @@ public class ClientHandler extends Thread{
     public void run(){
         try {
             if(clientHandlers.size()<2){
-                dos.writeUTF("Waiting for opponent");
+                dos.writeUTF("Server joined");
             }
         }
         catch(IOException e){
@@ -71,6 +71,18 @@ public class ClientHandler extends Thread{
             System.out.println(e);
         }
         return choice;
+    }
+    
+    public int getPoints() {
+        return points;
+    }
+    
+    public void resetPoints(){
+        points = 0;
+    }
+    
+    public void addPoint(){
+        points++;
     }
     
     String clearConsole() {

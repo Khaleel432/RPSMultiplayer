@@ -48,11 +48,12 @@ public class Client {
         try{
             String recieved = dis.readUTF();
             System.out.println(recieved);
-            if(!recieved.equals("Waiting for opponent")){
+            if(!recieved.equals("Server joined")){
                 String sendMessage = br.readLine();
                 dos.writeUTF(sendMessage);
                 dos.flush();
                 System.out.println("Sending message: " + sendMessage);
+                System.out.println("Waiting for opponent");
             }
         }
         catch(IOException e){
