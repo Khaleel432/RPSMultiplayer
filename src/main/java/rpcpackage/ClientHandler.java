@@ -84,7 +84,7 @@ public class ClientHandler extends Thread{
         String choice = "";
         try{
             System.out.println("Getting answer");
-            //dos.writeUTF("clearConsole");
+            dos.writeUTF("clearConsole");
             dos.writeUTF(listMenu());
             choice = dis.readUTF();
             while(invalidChoice(choice)){

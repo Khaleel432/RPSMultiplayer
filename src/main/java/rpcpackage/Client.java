@@ -13,55 +13,61 @@ import java.io.*;
 public class Client {
     
     public static void main(String args[]) throws IOException{
-        boolean isConnected = true;
+        
         Socket s = new Socket("localhost",7777);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         DataInputStream dis = new DataInputStream(s.getInputStream());
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-        
-        while(isConnected==true){
-            sendMessage(br,dis,dos,isConnected);
-        }
+        sendMessage(s,br,dis,dos);
         System.out.println("Lost connection to server");
-        closeResources(s,br,dis,dos);
     }
     
-    static void sendMessage(BufferedReader br, DataInputStream dis, DataOutputStream dos, Boolean isConnected) {
-        try{
-            String recieved = dis.readUTF();
-            if(recieved.equals("Server joined")){
-                recieved = dis.readUTF();
+    static void sendMessage(Socket s,BufferedReader br, DataInputStream dis, DataOutputStream dos) {
+        boolean isConnected = true;
+        while(isConnected==true){
+            try{
+                String recieved = dis.readUTF();
+                if(recieved.equals("Server joined")){
+                    recieved = dis.readUTF();
+                }
+                else if(recieved.equals("disconnect")){
+                    isConnected = false;
+                    System.out.println("Game complete, disconnecting from server.");
+                    closeResources(s,br,dis,dos);
+                }
+                if(recieved.equals("clearConsole")){
+                    try{
+                        clearConsole();
+                        recieved = dis.readUTF();
+                    }
+                    catch(IOException e){
+                        System.out.println(e);
+                    }
+                    catch(InterruptedException e){
+                        System.out.println(e);
+                    }
+                }
+                if (isConnected) {
+                    System.out.println(recieved);
+                    String sendMessage = br.readLine();
+                    dos.writeUTF(sendMessage);
+                    dos.flush();
+                    System.out.println(choice(sendMessage));
+                    //if(!recieved.equals("Server joined")){}
+                    System.out.println("Waiting for opponent");
+                }
+
             }
-            else if(recieved.equals("disconnect")){
+            catch(IOException e){
+                System.out.println(e);
                 isConnected = false;
-                System.out.println("Game complete, disconnecting from server.");
             }
-            if (isConnected) {
-                /*else if(recieved.equals("clearConsole")){
-                clearConsole();
-                System.out.println("Clearing Console");
-                recieved = dis.readUTF();
-                }*/
-                System.out.println(recieved);
-                String sendMessage = br.readLine();
-                dos.writeUTF(sendMessage);
-                dos.flush();
-                System.out.println(choice(sendMessage));
-                //if(!recieved.equals("Server joined")){}
-                System.out.println("Waiting for opponent");
-            }
-            
-        }
-        catch(IOException e){
-            System.out.println(e);
-            isConnected = false;
         }
     }
     
-    /*static void clearConsole() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }*/
+    final static void clearConsole() throws IOException, InterruptedException {
+        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+    }
     
     static String choice(String choice) {
         if(choice.equals("r")){
@@ -76,7 +82,7 @@ public class Client {
         return "";
     }
     
-    static void closeResources(Socket s, BufferedReader br, DataInputStream dis, DataOutputStream dos)throws IOException{
+    static void closeResources(Socket s,BufferedReader br, DataInputStream dis, DataOutputStream dos)throws IOException{
         s.close();
         br.close();
         dis.close();
