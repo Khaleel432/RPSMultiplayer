@@ -11,11 +11,13 @@ import java.util.*;
  * @author Khaleel
  */
 public class Server {
+    public static String version = "Version 0.2";
     static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
     
     public static void main(String args[]) throws IOException{
         getClients();
         startGame();
+        disconnectClients();
     }
     
     static void startGame() {
@@ -32,26 +34,46 @@ public class Server {
             String player1Choice = choices.get(0);
             String player2Choice = choices.get(1);
             choices.clear();
-            System.out.println("Payer 1 chose: " + player1Choice + " and player 2 chose: " + player2Choice);
+            System.out.println(player1.getUsername() + " chose: " + player1Choice + " and " + player2.getUsername() + " chose: " + player2Choice);
+            String result = "";
             if(player1Choice.equals(player2Choice)){
                 System.out.println("Result: Draw");
+                result = "Result was a draw!";
+                sendResult(result);
+                System.out.println(result);
             }
             else {
                 switch(player1Choice+player2Choice){
                     case "rs":
                     case "pr":
                     case "sp":
-                        System.out.println(player1.getUsername() + " wins!");
+                        result = "Result: " + player1.getUsername() + " wins!";
+                        sendResult(result);
+                        System.out.println(result);
                         player1.addPoint();
                         break;
                     case "sr":
                     case "ps":
                     case "rp":
-                        System.out.println(player2.getUsername() + " wins!");
+                        result = "Result: " + player2.getUsername() + " wins!";
+                        sendResult(result);
+                        System.out.println(result);
                         player2.addPoint();
                         break;
                 }
             }
+        }
+    }
+    
+    static void disconnectClients(){
+        for(ClientHandler client:clientHandlers){
+            client.disconnectClient();
+        }
+    }
+    
+    static void sendResult(String result) {
+        for(ClientHandler client:clientHandlers){
+            client.updateResult(result);
         }
     }
     

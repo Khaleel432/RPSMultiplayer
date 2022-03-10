@@ -16,6 +16,7 @@ public class ClientHandler extends Thread{
     private DataInputStream dis;
     private DataOutputStream dos;
     private String username;
+    private String result = "";
     private int points = 0;
     
     public ClientHandler(Socket s, DataInputStream dis, DataOutputStream dos) throws IOException{
@@ -39,8 +40,32 @@ public class ClientHandler extends Thread{
         }
     }
     
+    void updateResult(String result) {
+        this.result = result;
+    }
+    
+    void disconnectClient() {
+        try{
+            dos.writeUTF("disconnect");
+        }
+        catch(IOException e){
+            System.out.println(e);
+        }
+    }
+    
+    String listMenu() {
+        ClientHandler player1 = clientHandlers.get(0);
+        ClientHandler player2 = clientHandlers.get(1);
+        String menu = "\nRock Paper Scissors " + Server.version;
+        menu += "\n" + player1.getUsername() + ":" + player1.getPoints();
+        menu += "\t" + player2.getUsername() + ":" + player2.getPoints();
+        menu += "\n" + result;
+        menu += listChoice();
+        return menu;
+    }
+    
     String listChoice() {
-        String message = "Please choose one of the following:\n";
+        String message = "\n\nPlease choose one of the following:\n";
         message += "    Scissors:   s\n";
         message += "    Paper:      p\n";
         message += "    Rock:       r\n";
@@ -59,10 +84,11 @@ public class ClientHandler extends Thread{
         String choice = "";
         try{
             System.out.println("Getting answer");
-            dos.writeUTF(listChoice());
+            //dos.writeUTF("clearConsole");
+            dos.writeUTF(listMenu());
             choice = dis.readUTF();
             while(invalidChoice(choice)){
-                String message = "Invalid choice, please try again." + listChoice();
+                String message = "Invalid choice, please try again." + listMenu();
                 dos.writeUTF(message);
                 choice = dis.readUTF();
             }
@@ -83,10 +109,6 @@ public class ClientHandler extends Thread{
     
     public void addPoint(){
         points++;
-    }
-    
-    String clearConsole() {
-        return "\033[H\033[2J";
     }
     
     public String getUsername(){
