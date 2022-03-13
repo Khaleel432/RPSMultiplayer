@@ -11,7 +11,7 @@ import java.util.*;
  * @author Khaleel
  */
 public class Server {
-    public static String version = "Version 0.2";
+    public static String version = "Version 0.3";
     static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
     
     public static void main(String args[]) throws IOException{
@@ -80,6 +80,7 @@ public class Server {
     static void getClients() {
         try{
             ServerSocket ss = new ServerSocket(7777);
+            ss.setSoTimeout(10000);// TEST THIS 
             System.out.println("Waiting for players");
             while(clientHandlers.size()<2){
                 Socket s = ss.accept();

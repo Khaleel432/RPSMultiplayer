@@ -13,9 +13,18 @@ import java.io.*;
 public class Client {
     
     public static void main(String args[]) throws IOException{
-        
-        Socket s = new Socket("localhost",7777);
+        System.out.println("Rock Paper Scissors" + Server.version);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        
+        System.out.print("Please input the server IP Address: ");
+        String address = br.readLine();
+        System.out.print("Please input the server port: ");
+        int port = Integer.parseInt(br.readLine());
+        
+        System.out.println("Connecting to " + address + ":" + port);
+        InetAddress ip = InetAddress.getByName(address);
+        
+        Socket s = new Socket(ip,port);
         DataInputStream dis = new DataInputStream(s.getInputStream());
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
         sendMessage(s,br,dis,dos);
